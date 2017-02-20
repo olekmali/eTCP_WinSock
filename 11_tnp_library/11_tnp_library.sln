@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "11_tnp_library", "11_tnp_library\11_tnp_library.vcxproj", "{9BAA604E-92C7-4AAA-A20A-06DF4E624731}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_smtp", "12_smtp\12_smtp.vcxproj", "{1BD91450-0758-4777-98DF-65549A4F9B05}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "12_pop3", "12_pop3\12_pop3.vcxproj", "{C60D22E7-10C5-4206-9520-2A09E78E1D54}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9BAA604E-92C7-4AAA-A20A-06DF4E624731}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9BAA604E-92C7-4AAA-A20A-06DF4E624731}.Debug|Win32.Build.0 = Debug|Win32
+		{9BAA604E-92C7-4AAA-A20A-06DF4E624731}.Release|Win32.ActiveCfg = Release|Win32
+		{9BAA604E-92C7-4AAA-A20A-06DF4E624731}.Release|Win32.Build.0 = Release|Win32
+		{1BD91450-0758-4777-98DF-65549A4F9B05}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1BD91450-0758-4777-98DF-65549A4F9B05}.Debug|Win32.Build.0 = Debug|Win32
+		{1BD91450-0758-4777-98DF-65549A4F9B05}.Release|Win32.ActiveCfg = Release|Win32
+		{1BD91450-0758-4777-98DF-65549A4F9B05}.Release|Win32.Build.0 = Release|Win32
+		{C60D22E7-10C5-4206-9520-2A09E78E1D54}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C60D22E7-10C5-4206-9520-2A09E78E1D54}.Debug|Win32.Build.0 = Debug|Win32
+		{C60D22E7-10C5-4206-9520-2A09E78E1D54}.Release|Win32.ActiveCfg = Release|Win32
+		{C60D22E7-10C5-4206-9520-2A09E78E1D54}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

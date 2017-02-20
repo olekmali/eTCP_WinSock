@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04_multithreading_server_echo_tcp", "04_multithreading_server_echo_tcp\04_multithreading_server_echo_tcp.vcxproj", "{DE3653DE-61C0-4E2A-A83E-8776AB69EA39}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DE3653DE-61C0-4E2A-A83E-8776AB69EA39}.Debug|Win32.ActiveCfg = Debug|Win32
+		{DE3653DE-61C0-4E2A-A83E-8776AB69EA39}.Debug|Win32.Build.0 = Debug|Win32
+		{DE3653DE-61C0-4E2A-A83E-8776AB69EA39}.Release|Win32.ActiveCfg = Release|Win32
+		{DE3653DE-61C0-4E2A-A83E-8776AB69EA39}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
