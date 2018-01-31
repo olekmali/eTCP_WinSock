@@ -135,7 +135,7 @@ int main()
             fprintf(stdout, "%s has just contacted us.\n", name);
 
             visits++;
-            sprintf(buf,"Nice to meet you %s.\r\nYou are the %dth  person who stopped by today\r\n",  name, visits);
+            snprintf(buf, sizeof(buf), "Nice to meet you %s.\r\nYou are the %dth  person who stopped by today\r\n", name, visits);
             send(sd2,buf,strlen(buf),0);
             closesocket(sd2);
         }
