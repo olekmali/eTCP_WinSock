@@ -42,13 +42,13 @@ void SimpleHTTPServer(int port) {
         // Date: must be provided unless the server has no reliable clock - then it must not be provided
         strcat(webpage, "Connection: close\r\n");
         strcat(webpage, "Cache-Control: no-cache\r\nExpires: 0\r\nETag: \"\"\r\n");
-        strcat(webpage, "Content-Type: text/html; charset=ISO-8859-1\r\n");
+        strcat(webpage, "Content-Type: text/html; charset=UTF-8\r\n");
         strcat(webpage, "\r\n");
 
         // HTML Page header
         strcat(webpage, "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\r\n");
         strcat(webpage, "<html>\r\n<head>\r\n");
-        strcat(webpage, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=iso-8859-1\">\r\n");
+        strcat(webpage, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=UTF-8\">\r\n");
         strcat(webpage, "<title>A simple dynamic Web page</title></head>\r\n<body>\r\n");
 
         strcat(webpage, "<p>"); 

@@ -40,13 +40,13 @@ void SimpleHTTPServer(int port) {
         // Date: must be provided unless the server has no reliable clock - then it must not be provided
         TCPSendLine(visitor, "Connection: close\r\n");
         TCPSendLine(visitor, "Cache-Control: no-cache\r\nExpires: 0\r\nETag: \"\"\r\n");
-        TCPSendLine(visitor, "Content-Type: text/html; charset=ISO-8859-1\r\n");
+        TCPSendLine(visitor, "Content-Type: text/html; charset=UTF-8\r\n");
         TCPSendLine(visitor, "\r\n");
 
         // HTML Page header
         TCPSendLine(visitor, "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\r\n");
         TCPSendLine(visitor, "<html>\r\n<head>\r\n");
-        TCPSendLine(visitor, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=iso-8859-1\">\r\n");
+        TCPSendLine(visitor, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=UTF-8\">\r\n");
         TCPSendLine(visitor, "<title>A simple dynamic Web page</title>\r\n</head>\r\n<body>\r\n");
 
         TCPSendLine(visitor, "<p>"); 

@@ -20,7 +20,7 @@ void CreateReply(const char * status, const char * title, const char * message, 
     // Date: must be provided unless the server has no reliable clock - then it must not be provided
     strcat(buffer, "Connection: close\r\n");
     strcat(buffer, "Cache-Control: no-cache\r\nExpires: 0\r\nETag: \"\"\r\n");
-    strcat(buffer, "Content-Type: text/html; charset=ISO-8859-1\r\n");
+    strcat(buffer, "Content-Type: text/html; charset=UTF-8\r\n");
     if (realm!=0) {
         strcat(buffer, "WWW-Authenticate: Basic realm=\""); strcat(buffer, realm); strcat(buffer, "\"\r\n");
     }
@@ -28,7 +28,7 @@ void CreateReply(const char * status, const char * title, const char * message, 
 
     // HTML Page header
     strcat(buffer, "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\">\r\n");
-    strcat(buffer, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=iso-8859-1\">\r\n");
+    strcat(buffer, "<meta http-equiv=\"Content-type\" content=\"text/html; charset=UTF-8\">\r\n");
     strcat(buffer, "<html>\r\n<head><title>");
     strcat(buffer, title);
     strcat(buffer, "</title></head>\r\n<body>\r\n");
