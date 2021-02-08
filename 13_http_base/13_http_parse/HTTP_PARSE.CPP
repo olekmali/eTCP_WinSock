@@ -1,4 +1,6 @@
 //* A test for a Web server with a request parser *
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #include "tnplib.h"
 
 #include <iostream>

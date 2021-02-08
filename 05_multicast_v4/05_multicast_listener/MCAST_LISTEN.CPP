@@ -1,4 +1,6 @@
 /* * Multicasting listener (server) * */
+#define _CRT_SECURE_NO_WARNINGS 1
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
 #ifndef unix
 #include <winsock2.h>
 #include <ws2tcpip.h>

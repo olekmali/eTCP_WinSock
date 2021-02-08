@@ -16,6 +16,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define PROTOPORT 1200

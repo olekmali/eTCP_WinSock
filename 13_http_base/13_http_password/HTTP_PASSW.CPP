@@ -1,4 +1,6 @@
 //* A simple Web Server with a password-protected page *
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #include "tnplib.h"
 
 #include <iostream>

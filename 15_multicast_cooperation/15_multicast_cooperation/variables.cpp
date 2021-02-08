@@ -8,12 +8,13 @@ int          needtostop = 0;
 SOCKET      mcastsocket=0;
 sockaddr_in mcastaddr;
 
-const int   MPORT = 60001;
+const char* MPORT = "60001";
+const int   MPORTN = 60001;
 const char* MADDR = "224.2.2.2";
 
 void NetComStart() {
     SocketLibStart();
-    mcastsocket = UDPStartMServer(MPORT, 1);
+    mcastsocket = UDPStartMServer(MPORTN, 1);
     UDPMulticastJoin(mcastsocket , MADDR);
     UDPMulticastSetTTL(mcastsocket, 16);
     mcastaddr=CreateAddress(MADDR, MPORT);

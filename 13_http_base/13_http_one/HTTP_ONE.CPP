@@ -1,4 +1,6 @@
 //* A simple Web Server with one status page - better design *
+#define _CRT_SECURE_NO_WARNINGS 1
+
 #include "tnplib.h"
 
 #include <iostream>
@@ -52,7 +54,7 @@ void SimpleHTTPServer(int port) {
         strcat(webpage, "<title>A simple dynamic Web page</title></head>\r\n<body>\r\n");
 
         strcat(webpage, "<p>"); 
-        counter++; itoa(counter, buffer, 10); strcat(webpage, buffer);
+        counter++; _itoa(counter, buffer, 10); strcat(webpage, buffer);
         strcat(webpage, "</p>\r\n");
 
         // HTML Page footer

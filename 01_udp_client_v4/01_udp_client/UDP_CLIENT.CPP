@@ -17,6 +17,7 @@
 #endif
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define PORT "1200"                 /* default protocol port number */

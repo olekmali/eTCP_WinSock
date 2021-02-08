@@ -1,4 +1,7 @@
 //* A simple UDP Multicast service discovery with updated list of services *
+#define _CRT_SECURE_NO_WARNINGS 1
+#define _WINSOCK_DEPRECATED_NO_WARNINGS 1
+
 #include "tnplib.h"
 
 #ifdef unix
@@ -8,11 +11,11 @@
 inline void sleep (int sec) { Sleep(sec*1000); } 
 #endif
 
-#include <iostream>
 #include <cstring>
+#include <iostream>
 using namespace std;
 
-const int   MPORT = 60001;
+const char* MPORT = "60001";
 const char* MADDR = "224.2.2.2";
 const char* QSERA = "?any";     // any device type query
 const char* QSERD = "?sensor";  // this device type query
@@ -25,13 +28,13 @@ inline void D(const char *errormessage) {
 #endif
 }
 
-void MUDPSniff(const char * addr, int port) {
+void MUDPSniff(const char * addr, const char * port) {
     SOCKET ms;
     sockaddr_in recvAddr, sendAddr;
 
     char buffer[256];
 
-    ms = UDPStartMServer(port, 1);
+    ms = UDPStartMServer(atoi(port), 1);
     UDPMulticastJoin(ms , addr);
     UDPMulticastSetTTL(ms, 16);
     sendAddr=CreateAddress(addr, port);

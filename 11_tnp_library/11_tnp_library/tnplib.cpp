@@ -1,10 +1,11 @@
 /* * TNPLIB.C ECE-eTCP Course Library * */
 #include "tnplib.h"
 
-#include <iostream>
-#include <cstdio>
 #include <cstring>
-using namespace std;
+
+#ifdef _DEBUG
+#include <iostream>
+#endif
 
 #ifndef unix
 #define socklen_t int
@@ -42,31 +43,41 @@ SOCKET TCPStartServer(const int port, const int queue, const int reuse) {
     /* Map TCP transport protocol name to protocol number */
     ptrp = getprotobyname("tcp");
     if ((char*)(ptrp)==0) {
-        cerr << "cannot map \"tcp\" to protocol number" << endl;
+#ifdef _DEBUG
+        std::cerr << "cannot map \"tcp\" to protocol number" << std::endl;
+#endif
         return(-1);
     }
 
     /* Create a socket */
     sd = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
     if (int(sd)<0) {
-        cerr << "socket creation failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "socket creation failed" << std::endl;
+#endif
         return(-1);
     }
 
     if (reuse!=0 && setsockopt(sd,SOL_SOCKET,SO_REUSEADDR,(char*)&reuse,sizeof(reuse)) <0 ) {
-        cerr << "reuse address option failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "reuse address option failed" << std::endl;
+#endif
         return(-1);
     }
 
     /* Bind a local address to the socket */
     if (bind(sd, (struct sockaddr *)&sad, sizeof(sad)) < 0) {
-        cerr << "bind failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "bind failed" << std::endl;
+#endif
         return(-1);
     }
 
     /* Specify size of request queue */
     if (listen(sd, queue) < 0) {
-        cerr << "listen failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "listen failed" << std::endl;
+#endif
         return(-1);
     }
 
@@ -95,21 +106,27 @@ SOCKET TCPStartClient(const char *host, const char *port) {
     addr_req.ai_socktype = SOCK_STREAM;
     addr_req.ai_family = AF_INET; // Use: AF_INET6 or AF_INET or AF_UNSPEC
     if (0 != getaddrinfo(host, port, &addr_req, &addr_res)) {
-        fprintf(stderr, "cannot set up the destination address\n");
+#ifdef _DEBUG
+        std::cerr << "cannot set up the destination address" << std::endl;
+#endif
         return(-1);
     }
 
     /* Create a socket. */
     sd = (int)socket(addr_res->ai_family, addr_res->ai_socktype, addr_res->ai_protocol);
     if (sd < 0) {
-        cerr << "socket creation failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "socket creation failed" << std::endl;
+#endif
         freeaddrinfo(addr_res);
         return(-1);
     }
 
     /* Connect the socket to the specified server. */
     if (connect(sd, addr_res->ai_addr, addr_res->ai_addrlen) < 0) {
-        cerr << "connection failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "connection failed" << std::endl;
+#endif
         freeaddrinfo(addr_res);
         return(-1);
     }
@@ -142,9 +159,11 @@ int TCPSetNoDelay(SOCKET sd, int isOk) {
 #ifdef TCP_NODELAY
     return( setsockopt(sd,IPPROTO_TCP,TCP_NODELAY,(char*)&isOk,sizeof(isOk)) );
 #else
-    cerr << "TCP_NODELAY not supported by this platform - option ignored" << endl;
-    return(0);
+#ifdef _DEBUG
+    std::cerr << "TCP_NODELAY not supported by this platform - option ignored" << std::endl;
 #endif
+#endif
+    return(0);
 }
 
 int TCPPrepClose(SOCKET sd) {
@@ -218,25 +237,33 @@ SOCKET UDPStartMServer(const int port, int multiple) {
     /* Map TCP transport protocol name to protocol number */
     ptrp = getprotobyname("udp");
     if ((char*)(ptrp)==0) {
-        cerr << "cannot map \"udp\" to protocol number" << endl;
+#ifdef _DEBUG
+        std::cerr << "cannot map \"udp\" to protocol number" << std::endl;
+#endif
         return(-1);
     }
 
     /* Create a socket */
     sd = socket(PF_INET, SOCK_DGRAM, ptrp->p_proto);
     if (int(sd)<0) {
-        cerr << "socket creation failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "socket creation failed" << std::endl;
+#endif
         return(-1);
     }
 
     if (multiple!=0 && setsockopt(sd,SOL_SOCKET,SO_REUSEADDR,(char*) &multiple,sizeof(multiple)) <0 ) {
-        cerr << "reuse address option failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "reuse address option failed" << std::endl;
+#endif
         return(-1);
     }
 
     /* Bind a local address to the socket */
     if (bind(sd, (struct sockaddr *)&sad, sizeof(sad)) < 0) {
-        cerr << "bind failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "bind failed" << std::endl;
+#endif
         return(-1);
     }
 
@@ -251,7 +278,9 @@ SOCKET UDPStartClient() {
     SOCKET sd;
     sd=socket(AF_INET,SOCK_DGRAM,0);
     if (int(sd)<0) {
-        cerr << "socket creation failed" << endl;
+#ifdef _DEBUG
+        std::cerr << "socket creation failed" << std::endl;
+#endif
         return(-1);
     }
     return(sd);
@@ -286,20 +315,15 @@ int UDPMulticastSetTTL(SOCKET sd, int ttl) {
 }
 
 int UDPMulticastJoin(SOCKET sd, const char* address) {
-    struct  hostent  *ptrh;         /* pointer to a host table entry       */
     struct  sockaddr_in sad;        /* structure to hold an IP address     */
     struct  ip_mreq     mreq;       /* structure to hold multicast group info */
-
-    ptrh = gethostbyname(address);
-    if ((char*)(ptrh)==0) {
-        cerr << "invalid host: " << address << endl;
-        return(-1);
-    }
-    memcpy(&sad.sin_addr, ptrh->h_addr, ptrh->h_length);
+    sad = CreateAddress(address, INADDR_ANY);
 
     /* check given address is multicast */
     if(!IN_MULTICAST(ntohl(sad.sin_addr.s_addr))) {
-        cerr << "invalid multicast address: " << address << endl;
+#ifdef _DEBUG
+        std::cerr << "invalid multicast address: " << address << std::endl;
+#endif
         return(-1);
     }
 
@@ -309,25 +333,20 @@ int UDPMulticastJoin(SOCKET sd, const char* address) {
 }
 
 int UDPMulticastDrop(SOCKET sd, const char* address) {
-    struct  hostent  *ptrh;         /* pointer to a host table entry       */
     struct  sockaddr_in sad;        /* structure to hold an IP address     */
     struct  ip_mreq     mreq;       /* structure to hold multicast group info */
-
-    ptrh = gethostbyname(address);
-    if ((char*)(ptrh)==0) {
-        cerr << "invalid host: " << address << endl;
-        return(-1);
-    }
-    memcpy(&sad.sin_addr, ptrh->h_addr, ptrh->h_length);
+    sad = CreateAddress(address, INADDR_ANY);
 
     /* check given address is multicast */
-    if(!IN_MULTICAST(ntohl(sad.sin_addr.s_addr))) {
-        cerr << "invalid multicast address: " << address << endl;
+    if (!IN_MULTICAST(ntohl(sad.sin_addr.s_addr))) {
+#ifdef _DEBUG
+        std::cerr << "invalid multicast address: " << address << std::endl;
+#endif
         return(-1);
     }
 
-    mreq.imr_multiaddr.s_addr=sad.sin_addr.s_addr;
-    mreq.imr_interface.s_addr=htonl(INADDR_ANY);
+    mreq.imr_multiaddr.s_addr = sad.sin_addr.s_addr;
+    mreq.imr_interface.s_addr = htonl(INADDR_ANY);
     return( setsockopt(sd,IPPROTO_IP,IP_DROP_MEMBERSHIP, (char*) &mreq, sizeof(mreq)) );
 }
 
@@ -353,7 +372,9 @@ sockaddr_in CreateAddress(const char* address, const char *port) {
     addr_req.ai_socktype = SOCK_DGRAM;
     addr_req.ai_family = AF_INET; // Use: AF_INET6 or AF_INET or AF_UNSPEC
     if (0 != getaddrinfo(address, port, &addr_req, &addr_res)) {
-        cerr << "invalid host: " << address << endl;
+#ifdef _DEBUG
+        std::cerr << "invalid host: " << address << std::endl;
+#endif
         return(sad);
     }
 
