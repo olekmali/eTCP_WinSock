@@ -156,7 +156,7 @@ const char * page33 = "<h1>Device Off</h1><p>The device was already off.</p>";
 const char * menuln = "<hr /><p> <a href=\"/\">status</a> &nbsp; <a href=\"/on.html\">switch on</a> &nbsp; <a href=\"/off.html\">switch off</a> </p>";
 
       // ***** user-ID "Aladdin" and password "open sesame" results in *****
-      char   passwordline[80]="Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=="; 
+      char   passwordline[80]="Authorization: Basic QWxhZGRpbjpzZXNhbWU="; 
       // global static var, can be changed, redefined to be stored in EPROM, saved to v-disk, etc.
       // Needed: base64 encoder code for userid:password string to be able to update the passwordline
 
@@ -183,6 +183,7 @@ void SimpleHTTPServer(int port) {
 
         do {
             status = TCPRecvLine(visitor, buffer, sizeof(buffer) );
+            // cerr << buffer << endl;
             if (strcmp(buffer, passwordline)==0) passok=1;
         } while (status>0);
 
