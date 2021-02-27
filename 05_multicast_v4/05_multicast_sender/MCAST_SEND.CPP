@@ -19,127 +19,98 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-/* #define DEFAULT_IP "224.2.2.2" */
-/* #define DEFAULT_PORT 60001 */
+#define DEFAULT_IP      "224.2.2.2"
+#define DEFAULT_PORT    "60001"
 
 int main(int argc, char *argv[]) {
-
-    SOCKET          sd;
-    int             rc, i;
-    struct sockaddr_in cliAddr, servAddr;
-    struct in_addr  mcastAddr;
-    struct ip_mreq  mreq;
-    struct hostent *h;
-    unsigned short  p;
-    unsigned long   addr;
-    unsigned char   ttl;
-    int             one;
+    struct  protoent* ptrp;     /* pointer to a protocol table entry   */
+    SOCKET  sd;                         /* socket descriptor - integer */
+    int rc;                                      /* return status code */
 
 #ifdef WIN32
     WSADATA wsaData;
     if(WSAStartup(0x0101, &wsaData)!=0)
     {
-        fprintf(stderr, "Windows Socket Init failed: %d\n", GetLastError());
+        fprintf(stderr, "Windows Socket Init failed: %u\n", GetLastError());
         exit(1);
     }
 #endif
 
-    if(argc<4) {
+    if (argc<4) {
         printf("usage %s <maddress> <port> <data1> <data2> ... <dataN>\n", argv[0]);
         exit(1);
     }
     
-    h = gethostbyname(argv[1]);
-    if(h==NULL) {
-        printf("%s : unknown host %s\n", argv[0], argv[1]);
-        exit(1);
-    }
-    p =(unsigned short)atol(argv[2]);
-    if(p==0) {
-        printf("%s : invalid port %s\n", argv[0], argv[2]);
-        exit(1);
-    }
-    
-    memcpy((char *) &mcastAddr, h->h_addr_list[0], h->h_length);
-  
+    char* host = argv[1];
+    char* port = argv[2];
+    unsigned int port_nr = atoi(port);
+
     /* check given address is multicast */
-    if(!IN_MULTICAST(ntohl(mcastAddr.s_addr))) {
-        printf("%s : given address '%s' is not multicast\n", argv[0], inet_ntoa(mcastAddr));
+//  TO DO: if (!IN_MULTICAST( ????? )) { }
+
+    if (port_nr < 1024 || port_nr > 65535) {
+        fprintf(stderr, "invalid port number range %u\n", port_nr);
         exit(1);
     }
 
-    /* create socket */
-    sd = socket(AF_INET,SOCK_DGRAM,0);
-    if(sd<0) {
-        printf("%s : cannot create socket\n", argv[0]);
+    ptrp = getprotobyname("udp");
+    if (ptrp == 0) {
+        fprintf(stderr, "cannot map \"udp\" to protocol number\n");
         exit(1);
     }
 
-
-    /* enable multicasting on a network interface
-    addr = INADDR_ANY;
-    rc = setsockopt(sd, IPPROTO_IP, IP_MULTICAST_IF, (char *)&addr, sizeof(addr));
-    if (rc<0) {
-        printf("%s : cannot set the network interface to enable multicasting\n", argv[0]);
-        exit(1);
-    } /* */
-    
-    /* set multicast TTL - range
-    ttl = 1;
-    rc = setsockopt(sd, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&ttl, sizeof(ttl));
-    if (rc<0) {
-        printf("%s : cannot set ttl = %d\n", argv[0], ttl);
-        exit(1);
-    } /* */
-
-    /* allow multiple bind port */
-    one = 1;
-    setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char *)&one, sizeof(one));
-
-    /* bind port */
-    cliAddr.sin_family=AF_INET;
-    cliAddr.sin_addr.s_addr=htonl(INADDR_ANY);
-    cliAddr.sin_port=htons(p);  
-    if(bind(sd,(struct sockaddr *) &cliAddr, sizeof(cliAddr))<0) {
-        printf("%s : cannot bind port %d\n", argv[0], p);
+    /* Create a socket. */
+    sd = socket(PF_INET, SOCK_DGRAM, ptrp->p_proto);
+    if (sd < 0) {
+        fprintf(stderr, "socket creation failed\n");
         exit(1);
     }
 
-    /* set multicast TTL - range */
-    ttl = 1;
-    rc = setsockopt(sd, IPPROTO_IP, IP_MULTICAST_TTL, (char *)&ttl, sizeof(ttl));
-    if (rc<0) {
-        printf("%s : cannot set ttl = %d\n", argv[0], ttl);
-        exit(1);
+    {
+        // enable reuse of the same port (useful for all servers and multicast receviers)
+        unsigned int option = 1;
+        rc = setsockopt(sd, SOL_SOCKET, SO_REUSEADDR, (char*)&option, sizeof(option));
+                            //  ^^^ group of socket options (at socket level, at IP lever, at TCP or UDP lelvel
+                            //              ^^^ actual socket option (number)
+                            //                            ^^^ void pointer to option data (e.g. int or a complex structure)
+                            //                                             ^^ how large is the data variable in bytes
+        if ( rc<0 ) {
+            fprintf(stderr, "option SO_REUSEADDR failed\n");
+            // closesocket(sd); exit(1);
+        }
     }
 
-    /* join multicast group */
-    mreq.imr_multiaddr.s_addr=mcastAddr.s_addr;
-    mreq.imr_interface.s_addr=htonl(INADDR_ANY);
-    rc = setsockopt(sd, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&mreq, sizeof(mreq));
-    if(rc<0) {
-        printf("%s : cannot join multicast group %s\n", argv[0], inet_ntoa(mcastAddr));
-        exit(1);
+    {
+        // set multicast TTL - range
+        unsigned char ttl = 1;
+        rc = setsockopt(sd, IPPROTO_IP, IP_MULTICAST_TTL, (char*)&ttl, sizeof(ttl));
+        if (rc < 0) {
+            fprintf(stderr, "Cannot set multicast TTL value\n");
+            // closesocket(sd); exit(1);
+        }
     }
 
 
-    servAddr.sin_family = h->h_addrtype;
-    memcpy((char *) &servAddr.sin_addr.s_addr, h->h_addr, h->h_length);
-    servAddr.sin_port = htons(p);
-
-    printf("%s : sending data on multicast group %s (%s) port %d\n",argv[0],
-                            h->h_name, inet_ntoa(*(struct in_addr *) h->h_addr_list[0]), ntohs(servAddr.sin_port) );
+    /* construct a multicast address structure */
+    struct  sockaddr_in mad;    /* structure to hold mulitcast address */
+    memset(&mad, 0, sizeof(mad));
+    mad.sin_family = AF_INET;
+    mad.sin_addr.s_addr = inet_addr(host);
+    mad.sin_port = htons(port_nr);
 
     /* send data */
-    for(i=3;i<argc;i++) {
-        rc = sendto(sd,argv[i],strlen(argv[i])+1,0, (struct sockaddr *) &servAddr, sizeof(servAddr));
+    for(int i=3; i<argc; i++) {
+        const char* msg = argv[i];
+        const unsigned int len = strlen(msg);
+        rc = sendto(sd, msg, len, 0, (struct sockaddr*)&mad, sizeof(mad));
         
         if (rc<0) {
-            printf("%s : cannot send data number %d\n", argv[0], i-2);
+            fprintf(stderr, "cannot send message number %d\n", i-2);
             break;
         } else {
-            printf("%s : sent %d bytes in message %d\n", argv[0], strlen(argv[i])+1, i-2);
+            printf("message nr %d of %u bytes sent\n",i-2, len );
         }
         
     }/* end for */

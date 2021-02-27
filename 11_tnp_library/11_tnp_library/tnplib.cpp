@@ -234,7 +234,7 @@ SOCKET UDPStartMServer(const int port, int multiple) {
 
     sad.sin_port = htons((u_short)port);   /* use given port number */
 
-    /* Map TCP transport protocol name to protocol number */
+    /* Map UDP transport protocol name to protocol number */
     ptrp = getprotobyname("udp");
     if ((char*)(ptrp)==0) {
 #ifdef _DEBUG
