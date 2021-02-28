@@ -2,17 +2,18 @@
 #ifndef unix
 #include <winsock2.h>
 #include <ws2tcpip.h>
-/* also include Ws2_32.lib library in linking options */
+/* also include Use ws2_32.lib library for linking in linker input options */
+#define inet_pton InetPtonA
 #else
-#define closesocket close
-#define SOCKET int
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-/* also include xnet library for linking; on command line add: -lxnet */
+#define SOCKET int
+#define closesocket close
+/* also include xnet library for linking  on command line add: -lxnet */
 #endif
 
 #include <stdio.h>
@@ -34,7 +35,6 @@
  */
 int main(int argc, char *argv[])
 {
-    struct  protoent *ptrp;  /* pointer to a protocol table entry   */
     struct  sockaddr_in sad; /* structure to hold server's address  */
     SOCKET  sd;              /* socket descriptor - integer         */
     int     port;            /* protocol port number                */
@@ -65,15 +65,8 @@ int main(int argc, char *argv[])
     sad.sin_family = AF_INET;           /* set family to Internet   */
     sad.sin_addr.s_addr = INADDR_ANY;   /* set the local IP address */
 
-    /* Map UDP transport protocol name to protocol number */
-    ptrp = getprotobyname("udp");
-    if ( ptrp == 0) {
-        fprintf(stderr, "cannot map \"udp\" to protocol number");
-        exit(1);
-    }
-
     /* Create a socket */
-    sd = socket(PF_INET, SOCK_DGRAM, ptrp->p_proto);
+    sd = socket(PF_INET, SOCK_DGRAM, 0);
     if (sd < 0) {
         fprintf(stderr, "socket creation failed");
         exit(1);

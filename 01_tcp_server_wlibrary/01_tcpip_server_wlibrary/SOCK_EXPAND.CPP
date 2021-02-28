@@ -2,18 +2,18 @@
 #ifndef unix
 #include <winsock2.h>
 #include <ws2tcpip.h>
-/* also include Ws2_32.lib library for linking 
-   MsVC - AltF7 + linking options */
+/* also include Use ws2_32.lib library for linking in linker input options */
+#define inet_pton InetPtonA
 #else
-#define closesocket close
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-/* also include xnet library for linking 
-   on command line add: -lxnet */
+#define SOCKET int
+#define closesocket close
+/* also include xnet library for linking  on command line add: -lxnet */
 #endif
 
 #include <iostream>
@@ -111,7 +111,6 @@ void SocketLibEnd() {
 
 
 int TCPStartServer(const int port, const int queue, const int reuse) {
-    struct  protoent *ptrp;  /* pointer to a protocol table entry   */
     struct  sockaddr_in sad; /* structure to hold server's address  */
     int     sd;              /* socket descriptors                  */
 
@@ -121,15 +120,8 @@ int TCPStartServer(const int port, const int queue, const int reuse) {
 
     sad.sin_port = htons((u_short)port);   /* use given port number */
 
-    /* Map TCP transport protocol name to protocol number */
-    ptrp = getprotobyname("tcp");
-    if ( ptrp == 0) {
-        cerr << "cannot map \"tcp\" to protocol number" << endl;
-        return(-1);
-    }
-
     /* Create a socket */
-    sd = (int)socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
+    sd = (int)socket(PF_INET, SOCK_STREAM, 0);
     if (socket < 0) {
         cerr << "socket creation failed" << endl;
         return(-1);

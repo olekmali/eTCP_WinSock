@@ -17,7 +17,7 @@ void NetComStart() {
     mcastsocket = UDPStartMServer(MPORTN, 1);
     UDPMulticastJoin(mcastsocket , MADDR);
     UDPMulticastSetTTL(mcastsocket, 16);
-    mcastaddr=CreateAddress(MADDR, MPORT);
+    CreateAddress(MADDR, MPORT, &mcastaddr);
     UDPSetTimeout(mcastsocket, 100);
 }
 
@@ -52,5 +52,3 @@ void D(const char *errormessage) {
     std::cerr << errormessage << std::endl;
 #endif
 }
-
-

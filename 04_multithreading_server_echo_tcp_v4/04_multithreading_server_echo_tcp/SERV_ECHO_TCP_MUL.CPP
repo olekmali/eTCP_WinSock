@@ -1,19 +1,25 @@
 /* * Multithreaded Echo Servers on port 60000 for Transfer Control Protocol * */
 #ifndef unix
 #include <winsock2.h>
-/* also include Ws2_32.lib library in linking options */
-#include <process.h>
+#include <ws2tcpip.h>
+/* also include Use ws2_32.lib library for linking in linker input options */
+#define inet_pton InetPtonA
 #else
-!! this example shows only WIndows-based multithreading !!
-#define closesocket close
-#define SOCKET int
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-/* also include xnet library for linking; on command line add: -lxnet */
+#define SOCKET int
+#define closesocket close
+/* also include xnet library for linking  on command line add: -lxnet */
+#endif
+
+#ifndef unix
+#include <process.h>
+#else
+!!this example shows only Windows - based multithreading !!
 #include <pthread.h>
 #endif
 
@@ -29,8 +35,6 @@ void service_client(SOCKET cli);
 
 int main(int argc, char *argv[])
 {
-
-    struct  protoent *ptrp;  /* pointer to a protocol table entry   */
     struct  sockaddr_in sad; /* structure to hold server's address  */
     struct  sockaddr_in cad; /* structure to hold client's address  */
     SOCKET  sd, sd2;         /* socket descriptors                  */
@@ -63,16 +67,9 @@ int main(int argc, char *argv[])
     sad.sin_port = htons((u_short)port); /* set server port number  */
     sad.sin_family = AF_INET;         /* set family to Internet     */
     sad.sin_addr.s_addr = INADDR_ANY; /* set the local IP address   */
-    
-    /* Map TCP transport protocol name to protocol number */
-    ptrp = getprotobyname("tcp");
-    if ( ptrp == 0 ) {
-        fprintf(stderr, "Cannot map \"tcp\" to protocol number");
-        exit(1);
-    }
-    
+
     /* Create a socket */
-    sd = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
+    sd = socket(PF_INET, SOCK_STREAM, 0);
     if (sd < 0) {
         fprintf(stderr, "Socket creation failed\n");
         exit(1);
@@ -89,7 +86,7 @@ int main(int argc, char *argv[])
         fprintf(stderr,"Listen failed\n");
         exit(1);
     }
-    
+
     /* Main server loop - accept and handle requests */
     while (1)
     {
@@ -122,7 +119,7 @@ void service_client(SOCKET cli)
         
         if (n<0)
         {
-            fprintf(stderr,"Err in receiving\n");
+            fprintf(stderr,"Error in receiving\n");
             break;
         }
         else if (n==0) {

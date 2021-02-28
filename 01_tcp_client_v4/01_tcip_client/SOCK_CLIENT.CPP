@@ -2,17 +2,18 @@
 #ifndef unix
 #include <winsock2.h>
 #include <ws2tcpip.h>
-/* also include Ws2_32.lib library in linking options */
+/* also include Use ws2_32.lib library for linking in linker input options */
+#define inet_pton InetPtonA
 #else
-#define closesocket close
-#define SOCKET int
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-/* also include xnet library for linking; on command line add: -lxnet */
+#define SOCKET int
+#define closesocket close
+/* also include xnet library for linking  on command line add: -lxnet */
 #endif
 
 #include <stdio.h>
@@ -32,7 +33,7 @@
 int main()
 {
     struct  addrinfo addr_req;   /* default address parameters (hints) */
-    struct  addrinfo *addr_res;  /* ptr to the  address for connection */
+    struct  addrinfo* addr_res;  /* ptr to the  address for connection */
     SOCKET  sd;                  /* socket descriptor - integer        */
 
 #ifdef WIN32
@@ -47,7 +48,7 @@ int main()
     /* Convert host name and port name and address hints to the address */
     memset(&addr_req, 0, sizeof(addr_req));
     addr_req.ai_socktype = SOCK_STREAM;
-    addr_req.ai_family = AF_INET; // Use: AF_INET6 or AF_INET or AF_UNSPEC
+    addr_req.ai_family = AF_INET; /* Use: AF_INET6 or AF_INET or AF_UNSPEC */
     if (0 != getaddrinfo(HOST, PORT, &addr_req, &addr_res)) {
         fprintf(stderr, "cannot set up the destination address\n");
         exit(1);
@@ -73,15 +74,15 @@ int main()
     the initial greeting sent to us by the server       */
 
     {
-        char buf[1000];      /* buffer for data sent to the server  */
+        char buf[1000];     /* buffer for data sent to the server */
         snprintf(buf, sizeof(buf), "Automated Client\r\n");
         send(sd, buf, strlen(buf), 0);
     }
 
     {
-        int  n;              /* number of characters read           */
-        char buf[1000];      /* buffer for data from the server     */
-                             /* Repeatedly read data from socket and write to user's screen. */
+        int  n;             /* number of characters read           */
+        char buf[1000];     /* buffer for data from the server     */
+        /* Repeatedly read data from socket and write to user's screen. */
         n = recv(sd, buf, sizeof(buf), 0);
         while (n > 0) {
             fwrite(buf, n, 1, stdout);
@@ -93,9 +94,9 @@ int main()
     closesocket(sd);
 
 #ifdef WIN32
-    WSACleanup();                      /* release use of winsock.dll */
+    WSACleanup();                    /* release use of winsock.dll */
 #endif
 
-                                       /* Terminate the client program gracefully. */
+    /* Terminate the client program gracefully. */
     return(0);
 }

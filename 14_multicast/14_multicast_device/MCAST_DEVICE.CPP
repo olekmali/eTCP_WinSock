@@ -30,7 +30,7 @@ void MUDPDevice(const char * addr, const char * port) {
     ms = UDPStartMServer(atoi(port), 1);
     UDPMulticastJoin(ms , addr);
     UDPMulticastSetTTL(ms, 16);
-    sendAddr=CreateAddress(addr, port);
+    CreateAddress(addr, port, &sendAddr);
 
     /* Initial send without being asked */
     strcpy(buffer, RSERD);

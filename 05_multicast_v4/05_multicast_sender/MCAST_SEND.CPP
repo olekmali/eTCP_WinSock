@@ -4,17 +4,18 @@
 #ifndef unix
 #include <winsock2.h>
 #include <ws2tcpip.h>
-/* also include Ws2_32.lib library in linking options */
+/* also include Use ws2_32.lib library for linking in linker input options */
+#define inet_pton InetPtonA
 #else
-#define closesocket close
-#define SOCKET int
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-/* also include xnet library for linking; on command line add: -lxnet */
+#define SOCKET int
+#define closesocket close
+/* also include xnet library for linking  on command line add: -lxnet */
 #endif
 
 #include <stdio.h>
@@ -25,7 +26,6 @@
 #define DEFAULT_PORT    "60001"
 
 int main(int argc, char *argv[]) {
-    struct  protoent* ptrp;     /* pointer to a protocol table entry   */
     SOCKET  sd;                         /* socket descriptor - integer */
     int rc;                                      /* return status code */
 
@@ -55,14 +55,8 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    ptrp = getprotobyname("udp");
-    if (ptrp == 0) {
-        fprintf(stderr, "cannot map \"udp\" to protocol number\n");
-        exit(1);
-    }
-
     /* Create a socket. */
-    sd = socket(PF_INET, SOCK_DGRAM, ptrp->p_proto);
+    sd = socket(PF_INET, SOCK_DGRAM, 0);
     if (sd < 0) {
         fprintf(stderr, "socket creation failed\n");
         exit(1);
@@ -97,7 +91,11 @@ int main(int argc, char *argv[]) {
     struct  sockaddr_in mad;    /* structure to hold mulitcast address */
     memset(&mad, 0, sizeof(mad));
     mad.sin_family = AF_INET;
-    mad.sin_addr.s_addr = inet_addr(host);
+    rc = inet_pton(AF_INET, host, &mad.sin_addr.s_addr);
+    if (rc <= 0) {
+        fprintf(stderr, "invalid address %s\n", host);
+        closesocket(sd); exit(1);
+    }
     mad.sin_port = htons(port_nr);
 
     /* send data */

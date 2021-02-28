@@ -2,18 +2,18 @@
 #ifndef unix
 #include <winsock2.h>
 #include <ws2tcpip.h>
-/* also include Ws2_32.lib library in linking options */
+/* also include Use ws2_32.lib library for linking in linker input options */
+#define inet_pton InetPtonA
 #else
-#define closesocket close
-#define SOCKET int
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-#include <sys/time.h> // for timeout option
-/* also include xnet library for linking; on command line add: -lxnet */
+#define SOCKET int
+#define closesocket close
+/* also include xnet library for linking  on command line add: -lxnet */
 #endif
 
 #include <stdio.h>
@@ -96,7 +96,7 @@ int main()
             /* Read data from socket and write to user's screen. */
             n = recvfrom(sd,buf,sizeof(buf),0,(struct sockaddr*)&src_addr,&src_addr_len);
             if (n >= 0) {
-                buf[n]='\0';    /* just in case place the termination at the end of the string */
+                buf[n]='\0';    /* place the termination at the end of the string */
                 printf("%s", buf);
             } else {
                 fprintf(stderr, "Receiving timeout");

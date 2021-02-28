@@ -1,17 +1,19 @@
 /* * Concurent Echo Servers on port 60000 for Transfer Control Protocol * */
 #ifndef unix
 #include <winsock2.h>
-/* also include Ws2_32.lib library in linking options */
+#include <ws2tcpip.h>
+/* also include Use ws2_32.lib library for linking in linker input options */
+#define inet_pton InetPtonA
 #else
-#define closesocket close
-#define SOCKET int
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <unistd.h>
-/* also include xnet library for linking; on command line add: -lxnet */
+#define SOCKET int
+#define closesocket close
+/* also include xnet library for linking  on command line add: -lxnet */
 #endif
 
 #include <stdio.h>
@@ -27,8 +29,6 @@ int OneTCPEcho(SOCKET s);
 
 int main(int argc, char *argv[])
 {
-
-    struct  protoent *ptrp;  /* pointer to a protocol table entry   */
     struct  sockaddr_in sad; /* structure to hold server's address  */
     struct  sockaddr_in cad; /* structure to hold client's address  */
     SOCKET  sd;              /* server socket descriptor            */
@@ -64,15 +64,8 @@ int main(int argc, char *argv[])
     sad.sin_family = AF_INET;         /* set family to Internet     */
     sad.sin_addr.s_addr = INADDR_ANY; /* set the local IP address   */
     
-    /* Map TCP transport protocol name to protocol number */
-    ptrp = getprotobyname("tcp");
-    if (ptrp == 0) {
-        fprintf(stderr, "cannot map \"tcp\" to protocol number");
-        exit(1);
-    }
-    
     /* Create a socket */
-    sd = socket(PF_INET, SOCK_STREAM, ptrp->p_proto);
+    sd = socket(PF_INET, SOCK_STREAM, 0);
     if (sd < 0) {
         fprintf(stderr, "socket creation failed\n");
         exit(1);
@@ -89,10 +82,6 @@ int main(int argc, char *argv[])
         fprintf(stderr,"listen failed\n");
         exit(1);
     }
-
-
-
-
 
     FD_ZERO(&afds);
     FD_SET(sd, &afds);

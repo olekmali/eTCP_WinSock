@@ -30,7 +30,7 @@ void MUDPSniff(const char * addr, const char * port) {
     ms = UDPStartMServer(atoi(port), 1);
     UDPMulticastJoin(ms , addr);
     UDPMulticastSetTTL(ms, 16);
-    sendAddr=CreateAddress(addr, port);
+    CreateAddress(addr, port, &sendAddr);
 
     strcpy(buffer, QSERA);
     UDPSendAny(ms, buffer, strlen(buffer)+1, &sendAddr);

@@ -11,6 +11,9 @@ inline int isValidSocket(SOCKET sd) { return(sd!=INVALID_SOCKET); }
 //#define isValidSocket(sd) (sd!=INVALID_SOCKET)
 /* also include Use ws2_32.lib library for linking in linker input options */
 
+#define inet_pton InetPtonA
+// Windows uses a non-ANSI name for this function
+
 #else
 
 #include <sys/types.h>
@@ -78,7 +81,6 @@ int     UDPRecvAny(SOCKET sd, char *buffer, const int maxsize, sockaddr_in* remo
 int     UDPSendAny(SOCKET sd, const char *buffer, int size, const sockaddr_in* remoteaddr);
 // returns number of bytes sent, <0 if error
 
-sockaddr_in CreateAddress(const char* address, const char *port);
-
+void    CreateAddress(const char* address, const char* port, sockaddr_in* sad);
 
 #endif
