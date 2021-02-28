@@ -332,8 +332,11 @@ int UDPSendAny(SOCKET sd, const char *buffer, int size, const sockaddr_in* remot
 }
 
 void CreateAddress(const char* address, const char *port, sockaddr_in * sad) {
-    memset(sad,0,sizeof(sockaddr_in)); /* clear sockaddr structure */
-    sad->sin_family = AF_INET;
-    inet_pton(AF_INET, address, &(sad->sin_addr));
-    sad->sin_port = htons( atoi(port) );
+    struct  addrinfo addr_req;   /* default address parameters (hints) */
+    memset(&addr_req, 0, sizeof(addr_req));
+    addr_req.ai_family = AF_INET;
+    addr_req.ai_socktype = SOCK_DGRAM;
+    struct  addrinfo* addr_res;  /* ptr to the resolved address */
+    getaddrinfo(address, port, &addr_req, &addr_res);
+    memcpy(sad, addr_res->ai_addr, addr_res->ai_addrlen );
 }
